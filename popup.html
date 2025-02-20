@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Commit & Comment Search</title>
+  <script src="popup.js" defer></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h2>🔎 <strong>GitHub Commit & Comment Search</strong></h2>
+
+  <div class="input-container">
+    <input type="password" id="tokenInput" placeholder="🔑 GitHub 토큰 입력">
+    <input type="text" id="repoOwner" placeholder="👤 사용자명">
+    <input type="text" id="repoName" placeholder="📁 레포지토리 이름">
+    <input type="text" id="searchInput" placeholder="🔍 검색어 입력">
+  </div>
+
+  <div class="button-container">
+    <button id="saveToken">💾 토큰 저장</button>
+    <button id="searchButton">🔍 검색</button>
+  </div>
+
+  <h3>📌 검색 결과</h3>
+  <ul id="results"></ul>
+</body>
+</html>
