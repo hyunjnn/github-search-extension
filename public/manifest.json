@@ -6,11 +6,11 @@
     "permissions": ["storage", "activeTab", "scripting"],
     "host_permissions": ["https://api.github.com/*"],
     "action": {
-      "default_popup": "popup.html",
+      "default_popup": "src/index.html",
       "default_icon": {
-        "16": "icon.jpg",
-        "48": "icon.jpg",
-        "128": "icon.jpg"
+        "16": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
       }
     },
     "background": {

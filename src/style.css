@@ -1,0 +1,54 @@
+html, body {
+    width: 600px;  /* 크롬 확장 프로그램 팝업 너비 최대는 800 */
+    min-height: 300px;  
+    max-height: 600px;  /* 크롬 확장 프로그램 팝업 높이 최대는 600 */
+    padding: 0;
+    margin: 0;
+    display: flex;
+    background-color: #0d1117; 
+    color: #F6F8FA;
+    overflow-x: hidden;
+}
+
+.popup-container {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* 제목 */
+h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    margin-top: 15px;
+    font-size: 1.4rem;
+}
+
+input {
+    width: 90%;
+    padding: 8px;
+    margin: 6px 0;
+    border: 1px solid #ace2d7;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #F6F8FA;
+    font-size: 1rem;
+}
+
+button {
+    width: 94%;
+    padding: 10px;
+    background-color: #00ffcc;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+button:hover {
+    background-color: #00ffcc;
+}
