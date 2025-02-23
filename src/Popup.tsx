@@ -48,6 +48,8 @@ const Popup = () => {
   const [token, setToken] = useState("");
   const [repoOwner, setRepoOwner] = useState("");
   const [repoName, setRepoName] = useState("");
+  const [currentRepoOwner, setCurrentRepoOwner] = useState("");
+  const [currentRepoName, setCurrentRepoName] = useState("");
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,14 +63,21 @@ const Popup = () => {
     });
 
     getRepoInfoFromUrl().then(({repoOwner, repoName}) => {
-      setRepoOwner(repoOwner);
-      setRepoName(repoName);
+      setCurrentRepoOwner(repoOwner);
+      setCurrentRepoName(repoName);
     });
   }, []);
 
   useEffect(() => {
     chrome.storage.local.set({ repoOwner, repoName, keyword, results });
   }, [repoOwner, repoName, keyword, results]);
+
+  const handleUseCurrentRepo = () => {
+    setRepoOwner(currentRepoOwner);
+    setRepoName(currentRepoName);
+    setKeyword("");
+    setResults([]);
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -166,6 +175,14 @@ const Popup = () => {
   return (
     <div className="popup-container">
       <h2>GitHub Commit & Comment Search</h2>
+      {currentRepoOwner && currentRepoName && (repoOwner !== currentRepoOwner || repoName !== currentRepoName) && (
+        <div className="repo-alert">
+          <p className="repo-alert-text">
+            Current Repo: <strong>{currentRepoOwner}/{currentRepoName}</strong>
+          </p>
+          <button className="use-current-repo-btn" onClick={handleUseCurrentRepo}>Change</button>
+        </div>
+      )}
       <input type="password" placeholder="Personal access tokens" value={token} onChange={(e) => setToken(e.target.value)} />
       <input type="text" placeholder="Repository owner" value={repoOwner} onChange={(e) => setRepoOwner(e.target.value)} />
       <input type="text" placeholder="Repository name" value={repoName} onChange={(e) => setRepoName(e.target.value)} />
