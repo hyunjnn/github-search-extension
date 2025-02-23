@@ -53,11 +53,22 @@ const Popup = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    chrome.storage.local.get(["repoOwner", "repoName", "keyword", "results"], (data) => {
+      if (data.repoOwner) setRepoOwner(data.repoOwner);
+      if (data.repoName) setRepoName(data.repoName);
+      if (data.keyword) setKeyword(data.keyword);
+      if (data.results) setResults(data.results);
+    });
+
     getRepoInfoFromUrl().then(({repoOwner, repoName}) => {
       setRepoOwner(repoOwner);
       setRepoName(repoName);
     });
   }, []);
+
+  useEffect(() => {
+    chrome.storage.local.set({ repoOwner, repoName, keyword, results });
+  }, [repoOwner, repoName, keyword, results]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
