@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./style.css";
 import SearchResults from "./components/SearchResults";
 
@@ -30,6 +30,20 @@ interface SearchResult {
   url: string;
 }
 
+const getRepoInfoFromUrl = () => {
+  return new Promise<{repoOwner: string; repoName: string}>((resolve) => {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      const url = tabs[0]?.url || "";
+      const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+        if (match) {
+          resolve({repoOwner: match[1], repoName: match[2]});
+        } else{
+          resolve({repoOwner: "", repoName: ""});
+        }
+    });
+  });
+};
+
 const Popup = () => {
   const [token, setToken] = useState("");
   const [repoOwner, setRepoOwner] = useState("");
@@ -37,6 +51,19 @@ const Popup = () => {
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getRepoInfoFromUrl().then(({repoOwner, repoName}) => {
+      setRepoOwner(repoOwner);
+      setRepoName(repoName);
+    });
+  }, []);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  }
 
   const handleSearch = () => {
     if (!token || !repoOwner || !repoName || !keyword) {
@@ -56,6 +83,7 @@ const Popup = () => {
         keyword,
       },
       async (response: { error?: string; results?: CommitData[] }) => {
+        console.log("API response:", response);
         setLoading(false);
 
         if (response.error) {
@@ -130,7 +158,7 @@ const Popup = () => {
       <input type="password" placeholder="Personal access tokens" value={token} onChange={(e) => setToken(e.target.value)} />
       <input type="text" placeholder="Repository owner" value={repoOwner} onChange={(e) => setRepoOwner(e.target.value)} />
       <input type="text" placeholder="Repository name" value={repoName} onChange={(e) => setRepoName(e.target.value)} />
-      <input type="text" placeholder="Keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+      <input type="text" placeholder="Keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={handleKeyDown}/>
       <button onClick={handleSearch} disabled={loading}>{loading ? "Loading..." : "Search"}</button>
       
       <SearchResults results={results} />
