@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./style.css";
 import SearchResults from "./components/SearchResults";
 
@@ -54,6 +54,11 @@ const Popup = () => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const tokenRef = useRef<HTMLInputElement>(null);
+  const repoOwnerRef = useRef<HTMLInputElement>(null);
+  const repoNameRef = useRef<HTMLInputElement>(null);
+  const keywordRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     chrome.storage.local.get(["repoOwner", "repoName", "keyword", "results"], (data) => {
       if (data.repoOwner) setRepoOwner(data.repoOwner);
@@ -66,6 +71,10 @@ const Popup = () => {
       setCurrentRepoOwner(repoOwner);
       setCurrentRepoName(repoName);
     });
+
+    if (tokenRef.current) {
+      tokenRef.current.focus();
+    }
   }, []);
 
   useEffect(() => {
@@ -79,9 +88,23 @@ const Popup = () => {
     setResults([]);
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, refIndex: number) => {
     if (event.key === "Enter") {
       handleSearch();
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      switch (refIndex) {
+        case 0: repoOwnerRef.current?.focus(); break;
+        case 1: repoNameRef.current?.focus(); break;
+        case 2: keywordRef.current?.focus(); break;
+      }
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      switch (refIndex) {
+        case 1: tokenRef.current?.focus(); break;
+        case 2: repoOwnerRef.current?.focus(); break;
+        case 3: repoNameRef.current?.focus(); break;
+      }
     }
   }
 
@@ -118,18 +141,20 @@ const Popup = () => {
   return (
     <div className="popup-container">
       <h2>GitHub Commit & Comment Search</h2>
+
       {currentRepoOwner && currentRepoName && (repoOwner !== currentRepoOwner || repoName !== currentRepoName) && (
         <div className="repo-alert">
           <p className="repo-alert-text">
-            Current Repo: <strong>{currentRepoOwner}/{currentRepoName}</strong>
+            Current repo: <strong>{currentRepoOwner}/{currentRepoName}</strong>
           </p>
           <button className="use-current-repo-btn" onClick={handleUseCurrentRepo}>Change</button>
         </div>
       )}
-      <input type="password" placeholder="Personal access tokens" value={token} onChange={(e) => setToken(e.target.value)} />
-      <input type="text" placeholder="Repository owner" value={repoOwner} onChange={(e) => setRepoOwner(e.target.value)} />
-      <input type="text" placeholder="Repository name" value={repoName} onChange={(e) => setRepoName(e.target.value)} />
-      <input type="text" placeholder="Keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={handleKeyDown}/>
+
+      <input ref={tokenRef} type="password" placeholder="Your Personal access token" value={token} onChange={(e) => setToken(e.target.value)} onKeyDown={(e) => handleKeyDown(e, 0)}/>
+      <input ref={repoOwnerRef} type="text" placeholder="Repository owner" value={repoOwner} onChange={(e) => setRepoOwner(e.target.value)} onKeyDown={(e) => handleKeyDown(e, 1)}/>
+      <input ref={repoNameRef} type="text" placeholder="Repository name" value={repoName} onChange={(e) => setRepoName(e.target.value)} onKeyDown={(e) => handleKeyDown(e, 2)}/>
+      <input ref={keywordRef} type="text" placeholder="Keyword" value={keyword} onChange={(e) => setKeyword(e.target.value)} onKeyDown={(e) => handleKeyDown(e, 3)}/>
       <button onClick={handleSearch} disabled={loading}>{loading ? "Loading..." : "Search"}</button>
       
       <SearchResults results={results} />
