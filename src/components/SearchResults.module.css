@@ -1,31 +1,37 @@
 .commitCard {
     background-color: #191d21;
-    border: 1px solid #c1f9cd;
+    border: 1px solid #414141;
     border-radius: 10px;
     padding: 10px;
     margin: 6px 0;
     text-align: left;
     word-wrap: break-word;
+  }
+  .commitCard:hover {
+    border: 1px solid #96ffea;
   }
   
   .commentCard {
     background-color: #191d21;
-    border: 1px solid #e5c8f5;
+    border: 1px solid #414141;
     border-radius: 10px;
     padding: 10px;
     margin: 6px 0;
     text-align: left;
     word-wrap: break-word;
   }
+  .commentCard:hover {
+    border: 1px solid #96ffea;
+  }
   
   .author {
-    color: #8b3030;
+    color: #db3b8b;
   }
   
   .link {
     display: block;
     margin-top: 5px;
-    color: #a6c9ec;
+    color: #0b76e0;
     text-decoration: none;
   }
   

@@ -143,12 +143,14 @@ const Popup = () => {
       <h2>GitHub Commit & Comment Search</h2>
 
       {currentRepoOwner && currentRepoName && (repoOwner !== currentRepoOwner || repoName !== currentRepoName) && (
-        <div className="repo-alert">
-          <p className="repo-alert-text">
-            Current repo: <strong>{currentRepoOwner}/{currentRepoName}</strong>
-          </p>
-          <button className="use-current-repo-btn" onClick={handleUseCurrentRepo}>Change</button>
-        </div>
+      <div className="repo-alert">
+        <span className="repo-name">{currentRepoOwner}/{currentRepoName}</span>
+        <button className="switch-repo-btn" title="Switch Repository" onClick={handleUseCurrentRepo}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8zm0 16v3l4-4-4-4v3a6 6 0 0 1-6-6H4a8 8 0 0 0 8 8z"/>
+          </svg>
+        </button>
+      </div>
       )}
 
       <input ref={tokenRef} type="password" placeholder="Your Personal access token" value={token} onChange={(e) => setToken(e.target.value)} onKeyDown={(e) => handleKeyDown(e, 0)}/>

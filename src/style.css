@@ -25,22 +25,68 @@ h2 {
     font-size: 1.4rem;
 }
 
+.repo-alert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  color: #ffffff;
+  max-width: 100%;
+  height: 24px; 
+  gap: 8px;
+}
+
+.repo-name {
+  font-weight: bold;
+  color: #00be59;
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+}
+
+.switch-repo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  width: 22px;
+  height: 22px;
+  color: #ffffff;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.switch-repo-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
 input {
     width: 90%;
     padding: 8px;
     margin: 6px 0;
-    border: 1px solid #ace2d7;
+    border: 1px solid #96ffea;
     border-radius: 5px;
     background-color: transparent;
-    color: #F6F8FA;
+    color: #ffffff;
     font-size: 1rem;
+}
+input:hover {
+    border: 1px solid white;
 }
 
 button {
     width: 94%;
     padding: 10px;
     background-color: #00ffcc;
-    color: black;
+    color: #0d1117;
     border: none;
     border-radius: 5px;
     font-weight: bold;
@@ -50,5 +96,5 @@ button {
     margin-bottom: 15px;
 }
 button:hover {
-    background-color: #00ffcc;
+    background-color: rgb(4, 182, 146);
 }
