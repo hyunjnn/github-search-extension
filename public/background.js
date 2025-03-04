@@ -1,10 +1,88 @@
+const oAuth2 = {
+  init() {
+    this.KEY = "GitHub_Access_Token";
+    this.AUTHORIZATION_URL = "https://github.com/login/oauth/authorize";
+    this.ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
+    this.CLIENT_ID = "Ov23li369RAOVkkLFDHl";
+    this.CLIENT_SECRET = "265b36c89f77c24eb4624de6f03a7abe20220947";
+    this.REDIRECT_URL = `https://${chrome.runtime.id}.chromiumapp.org/`;
+    this.SCOPES = ["repo"];
+  },
+
+  begin() {
+    this.init();
+    let authUrl = `${this.AUTHORIZATION_URL}?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(
+      this.REDIRECT_URL
+    )}&scope=${this.SCOPES.join(" ")}`;
+
+    chrome.identity.launchWebAuthFlow(
+      {
+        url: authUrl,
+        interactive: true,
+      },
+      (redirectUrl) => {
+        if (chrome.runtime.lastError || !redirectUrl) {
+          console.error("OAuth 인증 실패:", chrome.runtime.lastError);
+          return;
+        }
+
+        // 인증 코드 추출
+        const code = new URL(redirectUrl).searchParams.get("code");
+        if (code) {
+          this.requestToken(code);
+        }
+      }
+    );
+  },
+
+  requestToken(code) {
+    fetch(this.ACCESS_TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        client_id: this.CLIENT_ID,
+        client_secret: this.CLIENT_SECRET,
+        code,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.access_token) {
+          this.saveToken(data.access_token);
+          console.log("GitHub Access Token 저장 완료");
+        } else {
+          console.error("OAuth 토큰 요청 실패:", data);
+        }
+      })
+      .catch((error) => console.error("OAuth 토큰 요청 중 오류 발생:", error));
+  },
+
+  saveToken(token) {
+    chrome.storage.local.set({ GitHub_Access_Token: token }, () => {
+      console.log("GitHub Access Token 저장 완료");
+    });
+  },
+};
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "beginOAuth2") {
+    oAuth2.begin();
+  }
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "beginOAuth2") {
+    oAuth2.begin();
+  }
   if (request.action === "searchCommits") {
     const { repoOwner, repoName, keyword, token } = request;
 
     // 로컬 스토리지에서 기존 데이터 가져오기
     chrome.storage.local.get(["lastRepoOwner", "lastRepoName", "lastCommits", "lastComments"], (storedData) => {
-      // 1. 직전에 검색한 레포와 동일한 레포라면
+      // 직전에 검색한 레포와 동일한 레포라면
       if (storedData.lastRepoOwner === repoOwner && storedData.lastRepoName === repoName) {
         console.log(`동일 레포 검색, API 요청 생략: ${repoOwner}/${repoName}`);
 
@@ -21,7 +99,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return;
       }
 
-      // 2. 직전에 검색한 레포와 다른 새로운 레포라면면
+      // 직전에 검색한 레포와 다른 새로운 레포라면
       console.log(`새로운 레포 검색, API 요청 시작: ${repoOwner}/${repoName}`);
       let allCommits = [];
       let allComments = [];
@@ -108,7 +186,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           lastComments: allComments
         });
 
-        // 필터링된 검색색 결과 반환
+        // 필터링된 검색 결과 반환
         sendResponse({ results: [...filteredCommits, ...filteredComments] });
       })().catch(error => {
         console.error("[Error] API 요청 실패:", error);

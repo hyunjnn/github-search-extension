@@ -3,8 +3,8 @@
     "name": "GitHub Commit & Comment Search",
     "version": "1.0",
     "description": "GitHub 리포지토리 내에서 특정 키워드가 포함된 커밋과 코멘트를 검색합니다.",
-    "permissions": ["storage", "activeTab", "scripting", "tabs"],
-    "host_permissions": ["https://api.github.com/*"],
+    "permissions": ["storage","tabs","identity"],
+    "host_permissions": ["https://api.github.com/*", "https://github.com/*"],
     "action": {
       "default_popup": "src/index.html",
       "default_icon": {
@@ -15,6 +15,10 @@
     },
     "background": {
       "service_worker": "background.js"
+    },
+    "oauth2": {
+      "client_id": "Ov23li369RAOVkkLFDHl",
+      "scopes": ["repo"]
     }
   }
   
