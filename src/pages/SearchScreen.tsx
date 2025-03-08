@@ -1,8 +1,18 @@
 import { useEffect, useState, useRef } from "react";
-import SearchResults from "./SearchResults";
+import SearchResults from "../components/SearchResults";
+import { mockRepoInfo } from "../assets/mockData";
+import UserProfile from "../components/UserProfile";
+import RepoAlert from "../components/RepoAlert";
 
 interface SearchScreenProps {
   token: string;
+}
+
+interface SearchResult {
+  type: string;
+  author: string;
+  message: string;
+  url: string;
 }
 
 const getRepoInfoFromUrl = () => {
@@ -20,12 +30,17 @@ const getRepoInfoFromUrl = () => {
 };
 
 const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
+  const [userInfo, setUserInfo] = useState<{
+    login: string;
+    avatar_url: string;
+  } | null>(null);
+
   const [repoOwner, setRepoOwner] = useState("");
   const [repoName, setRepoName] = useState("");
   const [currentRepoOwner, setCurrentRepoOwner] = useState("");
   const [currentRepoName, setCurrentRepoName] = useState("");
   const [keyword, setKeyword] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
 
   const repoOwnerRef = useRef<HTMLInputElement>(null);
@@ -33,26 +48,49 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
   const keywordRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    chrome.storage.local.get(
-      ["repoOwner", "repoName", "keyword", "results"],
-      (data) => {
-        if (data.repoOwner) setRepoOwner(data.repoOwner);
-        if (data.repoName) setRepoName(data.repoName);
-        if (data.keyword) setKeyword(data.keyword);
-        if (data.results) setResults(data.results);
-      }
-    );
+    if (import.meta.env.MODE === "development") {
+      console.warn("Vite Dev Env: Using Mock User Data");
+      setUserInfo(mockRepoInfo.userInfo);
+    } else {
+      chrome.storage.local.get(["GitHub_User_Info"], (data) => {
+        if (data.GitHub_User_Info) {
+          setUserInfo(data.GitHub_User_Info);
+        }
+      });
+    }
+  }, []);
 
-    getRepoInfoFromUrl().then(({ repoOwner, repoName }) => {
-      setCurrentRepoOwner(repoOwner);
-      setCurrentRepoName(repoName);
-    });
+  useEffect(() => {
+    if (import.meta.env.MODE === "development") {
+      console.warn("Vite Dev Env: Using Mock Data");
+      setRepoOwner(mockRepoInfo.repoOwner);
+      setRepoName(mockRepoInfo.repoName);
+      setKeyword(mockRepoInfo.keyword);
+      setResults(mockRepoInfo.results);
+    } else {
+      chrome.storage.local.get(
+        ["repoOwner", "repoName", "keyword", "results"],
+        (data) => {
+          if (data.repoOwner) setRepoOwner(data.repoOwner);
+          if (data.repoName) setRepoName(data.repoName);
+          if (data.keyword) setKeyword(data.keyword);
+          if (data.results) setResults(data.results);
+        }
+      );
 
+      getRepoInfoFromUrl().then(({ repoOwner, repoName }) => {
+        setCurrentRepoOwner(repoOwner);
+        setCurrentRepoName(repoName);
+      });
+    }
     keywordRef.current?.focus();
   }, []);
 
   useEffect(() => {
-    chrome.storage.local.set({ repoOwner, repoName, keyword, results });
+    if (import.meta.env.MODE === "development") {
+    } else {
+      chrome.storage.local.set({ repoOwner, repoName, keyword, results });
+    }
   }, [repoOwner, repoName, keyword, results]);
 
   const handleKeyDown = (
@@ -100,45 +138,36 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
     setLoading(true);
     setResults([]);
 
-    chrome.runtime.sendMessage(
-      { action: "searchCommits", token, repoOwner, repoName, keyword },
-      (response) => {
+    if (import.meta.env.MODE === "development") {
+      setTimeout(() => {
         setLoading(false);
-        if (response.error) {
-          alert("Error: " + response.error);
-          return;
+        setResults(mockRepoInfo.results);
+      }, 1000);
+    } else {
+      chrome.runtime.sendMessage(
+        { action: "searchCommits", token, repoOwner, repoName, keyword },
+        (response) => {
+          setLoading(false);
+          if (response.error) {
+            alert("Error: " + response.error);
+            return;
+          }
+          setResults(response.results);
         }
-        setResults(response.results);
-      }
-    );
+      );
+    }
   };
 
   return (
     <>
-      {currentRepoOwner &&
-        currentRepoName &&
-        (repoOwner !== currentRepoOwner || repoName !== currentRepoName) && (
-          <div className="repo-alert">
-            <span className="repo-name">
-              {currentRepoOwner}/{currentRepoName}
-            </span>
-            <button
-              className="switch-repo-btn"
-              title="Switch Repository"
-              onClick={handleUseCurrentRepo}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                fill="currentColor"
-              >
-                <path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8zm0 16v3l4-4-4-4v3a6 6 0 0 1-6-6H4a8 8 0 0 0 8 8z" />
-              </svg>
-            </button>
-          </div>
-        )}
+      <UserProfile userInfo={userInfo} />
+      <RepoAlert
+        currentRepoOwner={currentRepoOwner}
+        currentRepoName={currentRepoName}
+        repoOwner={repoOwner}
+        repoName={repoName}
+        onSwitchRepo={handleUseCurrentRepo}
+      />
 
       <div className="search-screen">
         <div className="repo-input-container">
@@ -162,6 +191,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
         </div>
 
         <input
+          className="keyword"
           ref={keywordRef}
           type="text"
           placeholder="Keyword"

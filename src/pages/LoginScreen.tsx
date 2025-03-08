@@ -16,6 +16,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ setToken }) => {
 
   return (
     <div className="login-screen">
+      <h1 className="app-title">Commit Finder</h1>
+      <h2 className="subtitle">GitHub Commit & Comment Search</h2>
       <button className="github-login-btn" onClick={handleLogin}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
