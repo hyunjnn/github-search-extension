@@ -1,21 +1,19 @@
-import React from "react";
-import "./UserProfile.css";
+import styles from "./UserProfile.module.css";
+import { useUser } from "../context/UserContext";
 
-interface UserProfileProps {
-  userInfo: { login: string; avatar_url: string } | null;
-}
+const UserProfile = () => {
+  const { userInfo } = useUser();
 
-const UserProfile: React.FC<UserProfileProps> = ({ userInfo }) => {
   if (!userInfo) return null;
 
   return (
-    <div className="user-info">
+    <div className={styles.userInfo}>
       <img
+        className={styles.userAvatar}
         src={userInfo.avatar_url}
         alt={userInfo.login}
-        className="user-avatar"
       />
-      <span className="user-name">@{userInfo.login}</span>
+      <span className={styles.userName}>@{userInfo.login}</span>
     </div>
   );
 };

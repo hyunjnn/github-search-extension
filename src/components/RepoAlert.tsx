@@ -1,4 +1,4 @@
-import React from "react";
+import styles from "./RepoAlert.module.css";
 
 interface RepoAlertProps {
   currentRepoOwner: string;
@@ -8,24 +8,24 @@ interface RepoAlertProps {
   onSwitchRepo: () => void;
 }
 
-const RepoAlert: React.FC<RepoAlertProps> = ({
+const RepoAlert = ({
   currentRepoOwner,
   currentRepoName,
   repoOwner,
   repoName,
   onSwitchRepo,
-}) => {
+}: RepoAlertProps) => {
   if (!currentRepoOwner || !currentRepoName) return null;
   if (repoOwner === currentRepoOwner && repoName === currentRepoName)
     return null;
 
   return (
-    <div className="repo-alert">
-      <span className="repo-name">
+    <div className={styles.repoAlert}>
+      <span className={styles.repoName}>
         {currentRepoOwner}/{currentRepoName}
       </span>
       <button
-        className="switch-repo-btn"
+        className={styles.switchRepoBtn}
         title="Switch Repository"
         onClick={onSwitchRepo}
       >
