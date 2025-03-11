@@ -1,9 +1,9 @@
 import "../style.css";
-import LoginScreen from "./login/LoginPage";
-import SearchScreen from "./search/SearchPage";
-import { TokenProvider, useToken } from "../context/TokenContext";
-import { UserProvider } from "../context/UserContext";
-import { mockToken } from "../assets/mockData";
+import LoginScreen from "../login/LoginPage";
+import SearchScreen from "../search/SearchPage";
+import { TokenProvider, useToken } from "../../context/TokenContext";
+import { UserProvider } from "../../context/UserContext";
+import { mockToken } from "../../data/mockdata";
 import { useEffect } from "react";
 
 const PopupContent = () => {
@@ -24,8 +24,8 @@ const PopupContent = () => {
 
   return (
     <div className="popup-container">
-      {/* <h1 className="app-title">Commit Finder</h1>
-      <h2 className="subtitle">GitHub Commit & Comment Search</h2> */}
+      <h1 className="app-title">Commit Finder</h1>
+      <h2 className="subtitle">GitHub Commit & Comment Search</h2>
 
       {!token ? <LoginScreen /> : <SearchScreen />}
     </div>

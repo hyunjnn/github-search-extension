@@ -1,10 +1,9 @@
-import React from "react";
+import { useToken } from "../../context/TokenContext";
+import styles from "./LoginPage.module.css";
 
-interface LoginScreenProps {
-  setToken: (token: string) => void;
-}
+const LoginPage = () => {
+  const { setToken } = useToken();
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ setToken }) => {
   const handleLogin = () => {
     chrome.runtime.sendMessage({ action: "beginOAuth2" }, (response) => {
       if (response?.token) {
@@ -15,10 +14,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ setToken }) => {
   };
 
   return (
-    <div className="login-screen">
-      <h1 className="app-title">Commit Finder</h1>
-      <h2 className="subtitle">GitHub Commit & Comment Search</h2>
-      <button className="github-login-btn" onClick={handleLogin}>
+    <div className="login-page">
+      {/* <h1 className="app-title">Commit Finder</h1>
+      <h2 className="subtitle">GitHub Commit & Comment Search</h2> */}
+      <button className={styles.githubLoginBtn} onClick={handleLogin}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -34,4 +33,4 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ setToken }) => {
   );
 };
 
-export default LoginScreen;
+export default LoginPage;

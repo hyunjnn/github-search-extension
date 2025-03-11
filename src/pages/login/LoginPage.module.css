@@ -1,0 +1,16 @@
+.githubLoginBtn {
+    width: 250px;
+    /* background-color: #07b68a; #fa9b36 #44f479 */
+    border: 1px solid #373637f9;
+    display: flex; /* 버튼 내부 아이콘과 텍스트 정렬 */
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    gap: 8px;
+  }
+  .githubLoginBtn:hover {
+    background-color: #079f79;  /* #e48f35 오렌지 */
+  }
+  .githubLoginBtn:active {
+    transform: scale(0.99); /* 클릭 시 살짝 축소 */
+  }

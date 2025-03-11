@@ -1,12 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import SearchResults from "../components/SearchResults";
-import { mockRepoInfo } from "../assets/mockData";
-import UserProfile from "../components/UserProfile";
-import RepoAlert from "../components/RepoAlert";
-
-interface SearchScreenProps {
-  token: string;
-}
+import SearchResults from "../../components/SearchResults";
+// import UserProfile from "../../components/UserProfile";
+import RepoAlert from "../../components/RepoAlert";
+import { useToken } from "../../context/TokenContext";
+import styles from "./SearchPage.module.css";
+import { getRepoInfoFromUrl } from "../../utils/chromeUtils";
+import { mockRepoInfo } from "../../data/mockdata";
 
 interface SearchResult {
   type: string;
@@ -15,25 +14,8 @@ interface SearchResult {
   url: string;
 }
 
-const getRepoInfoFromUrl = () => {
-  return new Promise<{ repoOwner: string; repoName: string }>((resolve) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const url = tabs[0]?.url || "";
-      const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-      if (match) {
-        resolve({ repoOwner: match[1], repoName: match[2] });
-      } else {
-        resolve({ repoOwner: "", repoName: "" });
-      }
-    });
-  });
-};
-
-const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
-  const [userInfo, setUserInfo] = useState<{
-    login: string;
-    avatar_url: string;
-  } | null>(null);
+const SearchPage = () => {
+  const { token } = useToken();
 
   const [repoOwner, setRepoOwner] = useState("");
   const [repoName, setRepoName] = useState("");
@@ -46,19 +28,6 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
   const repoOwnerRef = useRef<HTMLInputElement>(null);
   const repoNameRef = useRef<HTMLInputElement>(null);
   const keywordRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (import.meta.env.MODE === "development") {
-      console.warn("Vite Dev Env: Using Mock User Data");
-      setUserInfo(mockRepoInfo.userInfo);
-    } else {
-      chrome.storage.local.get(["GitHub_User_Info"], (data) => {
-        if (data.GitHub_User_Info) {
-          setUserInfo(data.GitHub_User_Info);
-        }
-      });
-    }
-  }, []);
 
   useEffect(() => {
     if (import.meta.env.MODE === "development") {
@@ -160,7 +129,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
 
   return (
     <>
-      <UserProfile userInfo={userInfo} />
+      {/* <UserProfile /> */}
       <RepoAlert
         currentRepoOwner={currentRepoOwner}
         currentRepoName={currentRepoName}
@@ -169,8 +138,8 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
         onSwitchRepo={handleUseCurrentRepo}
       />
 
-      <div className="search-screen">
-        <div className="repo-input-container">
+      <div className="search-page">
+        <div className={styles.repoInputContainer}>
           <input
             ref={repoOwnerRef}
             type="text"
@@ -179,7 +148,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
             onChange={(e) => setRepoOwner(e.target.value)}
             onKeyDown={(e) => handleKeyDown(e, 0)}
           />
-          <span className="repo-slash">/</span>
+          {/* <span className={styles.repoSlash}>/</span> */}
           <input
             ref={repoNameRef}
             type="text"
@@ -213,4 +182,4 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ token }) => {
   );
 };
 
-export default SearchScreen;
+export default SearchPage;

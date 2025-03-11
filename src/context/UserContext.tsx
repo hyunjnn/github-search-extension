@@ -5,7 +5,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { mockRepoInfo } from "../assets/mockData";
+import { mockRepoInfo } from "../data/mockdata";
 
 interface UserInfo {
   login: string;
