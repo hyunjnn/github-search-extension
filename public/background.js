@@ -3,8 +3,11 @@ const oAuth2 = {
     this.KEY = "GitHub_Access_Token";
     this.AUTHORIZATION_URL = "https://github.com/login/oauth/authorize";
     this.ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token";
-    this.CLIENT_ID = "Ov23li369RAOVkkLFDHl";
-    this.CLIENT_SECRET = "265b36c89f77c24eb4624de6f03a7abe20220947";
+    this.PROFILE_URL = "https://api.github.com/user";
+    this.CLIENT_ID = "Ov23liUzqzkQ6f6TJCuB"; // dev
+    this.CLIENT_SECRET = "84416824a413a891339f1a2fe67b8bf95aa5c5ea"; //dev
+    // this.CLIENT_ID = "Ov23li369RAOVkkLFDHl"; // deploy
+    // this.CLIENT_SECRET = "265b36c89f77c24eb4624de6f03a7abe20220947"; // deploy
     this.REDIRECT_URL = `https://${chrome.runtime.id}.chromiumapp.org/`;
     this.SCOPES = ["repo"];
   },
@@ -63,9 +66,29 @@ const oAuth2 = {
       .catch((error) => console.error("OAuth 토큰 요청 중 오류 발생:", error));
   },
 
+  getUserInfo(token) {
+    return fetch(this.PROFILE_URL, {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    })
+      .then((response) => response.json())
+      .then((user) => {
+        if (user && user.login) {
+          console.log("GitHub 사용자 정보 가져오기 성공:", user);
+          chrome.storage.local.set({ GitHub_User_Info: user });
+        }
+      })
+      .catch((error) =>
+        console.error("GitHub 사용자 정보 가져오기 실패:", error)
+      );
+  },
+
   saveToken(token) {
     chrome.storage.local.set({ GitHub_Access_Token: token }, () => {
       console.log("GitHub Access Token 저장 완료");
+      this.getUserInfo(token);
     });
   },
 };

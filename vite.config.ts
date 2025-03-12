@@ -3,14 +3,21 @@ import react from "@vitejs/plugin-react-swc";
 import { resolve } from "path";
 
 export default defineConfig({
+  root: "src",
+  publicDir: "../public",
   css: {
     modules: {
       scopeBehaviour: "local",
     },
   },
+  server: {
+    port: 5173,
+    strictPort: true,
+    open: true,
+  },
   plugins: [react()],
   build: {
-    outDir: "dist",
+    outDir: "../dist",
     emptyOutDir: true,
     rollupOptions: {
       input: {
