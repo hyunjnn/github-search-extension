@@ -1,0 +1,23 @@
+.popupContainer {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.appTitle {
+  font-size: 2rem; /* 프로그램 이름을 더 크게 */
+  font-weight: bold;
+  color: #00ffd0; /* 프로그램의 메인 색상 #00ffcc  */
+  text-align: center;
+  margin-top: 13px;
+  margin-bottom: 5px;
+}
+
+.subTitle {
+  font-size: 0.8rem; /* 부가 설명은 작게 */
+  font-weight: normal;
+  color: #aaa; /* 흐리게 처리 */
+  text-align: center;
+}

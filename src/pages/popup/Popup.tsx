@@ -1,4 +1,4 @@
-import "../style.css";
+import styles from "./Popup.module.css";
 import LoginScreen from "../login/LoginPage";
 import SearchScreen from "../search/SearchPage";
 import { TokenProvider, useToken } from "../../context/TokenContext";
@@ -23,9 +23,9 @@ const PopupContent = () => {
   }, []);
 
   return (
-    <div className="popup-container">
-      <h1 className="app-title">Commit Finder</h1>
-      <h2 className="subtitle">GitHub Commit & Comment Search</h2>
+    <div className={styles.popupContainer}>
+      <h1 className={styles.appTitle}>Commit Finder</h1>
+      <h2 className={styles.subTitle}>GitHub Commit & Comment Search</h2>
 
       {!token ? <LoginScreen /> : <SearchScreen />}
     </div>

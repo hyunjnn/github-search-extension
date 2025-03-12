@@ -1,18 +1,18 @@
-.user-info {
+.userInfo {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
   }
   
-  .user-avatar {
+  .userAvatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid #525253;
+    border: 1px solid #4a4a4a;
   }
   
-  .user-name {
+  .userName {
     font-size: 14px;
     font-weight: bold;
     color: #d6d4d4;
