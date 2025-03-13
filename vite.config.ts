@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 export default defineConfig({
   root: "src",
-  publicDir: "../public",
+  publicDir: "assets",
   css: {
     modules: {
       scopeBehaviour: "local",
@@ -22,6 +22,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, "src/index.html"),  
+        background: resolve(__dirname, "src/scripts/background.js"),
+        authorize: resolve(__dirname, "src/scripts/authorize.js")
       },
       output: {
         entryFileNames: "[name].js",  
