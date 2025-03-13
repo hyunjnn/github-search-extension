@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "GitHub Commit & Comment Search",
+    "version": "1.1",
+    "description": "GitHub 리포지토리 내에서 특정 키워드가 포함된 커밋과 코멘트를 검색합니다.",
+    "permissions": ["storage","tabs"],
+    "host_permissions": ["https://api.github.com/*", "https://github.com/*"],
+    "action": {
+      "default_popup": "index.html",
+      "default_icon": {
+        "16": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
+      }
+    },
+    "background": {
+      "service_worker": "background.js",
+      "type": "module"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://github.com/login/oauth/authorize*", "https://github.com/?code=*"],
+        "js": ["authorize.js"],
+        "run_at": "document_idle"
+      }
+    ]
+  }
+  
