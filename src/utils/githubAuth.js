@@ -4,10 +4,10 @@ export const GitHubOAuth = {
   AUTHORIZATION_URL: "https://github.com/login/oauth/authorize",
   ACCESS_TOKEN_URL: "https://github.com/login/oauth/access_token",
   PROFILE_URL: "https://api.github.com/user",
-  CLIENT_ID: "Ov23liUzqzkQ6f6TJCuB", // dev
-  CLIENT_SECRET: "84416824a413a891339f1a2fe67b8bf95aa5c5ea", // dev
-  //   CLIENT_ID: "Ov23li369RAOVkkLFDHl", // deploy
-  //   CLIENT_SECRET: "265b36c89f77c24eb4624de6f03a7abe20220947", // deploy
+  // CLIENT_ID: "Ov23liUzqzkQ6f6TJCuB", // dev
+  // CLIENT_SECRET: "84416824a413a891339f1a2fe67b8bf95aa5c5ea", // dev
+  CLIENT_ID: "Ov23li369RAOVkkLFDHl", // deploy
+  CLIENT_SECRET: "265b36c89f77c24eb4624de6f03a7abe20220947", // deploy
   REDIRECT_URL: "https://github.com/",
   SCOPES: ["repo"],
 
