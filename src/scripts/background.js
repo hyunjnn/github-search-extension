@@ -1,95 +1,20 @@
-import axios from "axios";
-
-const oAuth2 = {
-  KEY: "GitHub_Access_Token",
-  AUTHORIZATION_URL: "https://github.com/login/oauth/authorize",
-  ACCESS_TOKEN_URL: "https://github.com/login/oauth/access_token",
-  PROFILE_URL: "https://api.github.com/user",
-  CLIENT_ID: "Ov23liUzqzkQ6f6TJCuB", // dev
-  CLIENT_SECRET: "84416824a413a891339f1a2fe67b8bf95aa5c5ea", //dev
-  // this.CLIENT_ID = "Ov23li369RAOVkkLFDHl"; // deploy
-  // this.CLIENT_SECRET = "265b36c89f77c24eb4624de6f03a7abe20220947"; // deploy
-  // this.REDIRECT_URL = `https://${chrome.runtime.id}.chromiumapp.org/`;
-  REDIRECT_URL: "https://github.com/",
-  SCOPES: ["repo"],
-
-  begin: async () => {
-    const authUrl = `${oAuth2.AUTHORIZATION_URL}?client_id=${
-      oAuth2.CLIENT_ID
-    }&redirect_uri=${encodeURIComponent(
-      oAuth2.REDIRECT_URL
-    )}&scope=${oAuth2.SCOPES.join(" ")}`;
-
-    await chrome.tabs.create({ url: authUrl, active: true });
-  },
-
-  requestToken: async (code) => {
-    try {
-      const response = await axios.post(
-        oAuth2.ACCESS_TOKEN_URL,
-        {
-          client_id: oAuth2.CLIENT_ID,
-          client_secret: oAuth2.CLIENT_SECRET,
-          code,
-        },
-        {
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
-
-      if (response.data.access_token) {
-        await oAuth2.saveToken(response.data.access_token);
-        console.log("GitHub Access Token 저장 완료");
-      } else {
-        console.error("OAuth 토큰 요청 실패:", response.data);
-      }
-    } catch (error) {
-      console.error("OAuth 토큰 요청 중 오류 발생:", error);
-    }
-  },
-
-  getUserInfo: async (token) => {
-    try {
-      const response = await axios.get(oAuth2.PROFILE_URL, {
-        headers: {
-          Authorization: `token ${token}`,
-          Accept: "application/vnd.github.v3+json",
-        },
-      });
-
-      if (response.data && response.data.login) {
-        console.log("GitHub 사용자 정보 가져오기 성공:", response.data);
-        await chrome.storage.local.set({ GitHub_User_Info: response.data });
-      }
-    } catch (error) {
-      console.log("GitHub 사용자 정보 가져오기 실패:", error);
-    }
-  },
-
-  saveToken: async (token) => {
-    await chrome.storage.local.set({ GitHub_Access_Token: token });
-    console.log("GitHub Access Token 저장 완료");
-    await oAuth2.getUserInfo(token);
-  },
-};
+import { GitHubAPI } from "../utils/githubAPI";
+import { GitHubOAuth } from "../utils/githubAuth";
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "beginOAuth2") {
-    oAuth2.begin();
+    GitHubOAuth.beginOAuth();
   }
   if (request.action === "githubOAuthCode") {
     console.log("백그라운드에서 인가 코드 수신:", request.code);
-    oAuth2.requestToken(request.code);
+    GitHubOAuth.requestToken(request.code);
   }
   if (request.action === "searchCommits") {
     const { repoOwner, repoName, keyword, token } = request;
 
     chrome.storage.local.get(
       ["lastRepoOwner", "lastRepoName", "lastCommits", "lastComments"],
-      (storedData) => {
-        // 직전에 검색한 레포와 동일한 레포라면
+      async (storedData) => {
         if (
           storedData.lastRepoOwner === repoOwner &&
           storedData.lastRepoName === repoName
@@ -97,114 +22,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log(
             `동일 레포 검색, API 요청 생략: ${repoOwner}/${repoName}`
           );
-
-          // 기존 검색 결과에서 키워드 필터링 수행 및 결과 반환
           const filteredCommits = storedData.lastCommits.filter((commit) =>
             commit.message.toLowerCase().includes(keyword.toLowerCase())
           );
-
           const filteredComments = storedData.lastComments.filter((comment) =>
             comment.message.toLowerCase().includes(keyword.toLowerCase())
           );
-
           sendResponse({ results: [...filteredCommits, ...filteredComments] });
           return;
         }
 
-        // 직전에 검색한 레포와 다른 새로운 레포라면
         console.log(
           `새로운 레포 검색, API 요청 시작: ${repoOwner}/${repoName}`
         );
-        let allCommits = [];
-        let allComments = [];
 
-        const fetchAllCommits = async () => {
-          let page = 1;
-          while (true) {
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/commits?per_page=100&page=${page}`;
-            try {
-              const response = await axios.get(apiUrl, {
-                headers: {
-                  Authorization: `token ${encodeURIComponent(token)}`,
-                  Accept: "application/vnd.github.v3+json",
-                },
-              });
-
-              if (!Array.isArray(response.data) || response.data.length === 0)
-                break;
-
-              allCommits = allCommits.concat(
-                response.data.map((commit) => ({
-                  type: "commit",
-                  author: commit.commit.author.name,
-                  message: commit.commit.message,
-                  url: commit.html_url,
-                  sha: commit.sha,
-                }))
-              );
-
-              console.log(
-                `${page} 페이지의 커밋 데이터 가져옴: ${response.data.length}개`
-              );
-              page++;
-            } catch (error) {
-              console.error("커밋 데이터 가져오기 실패:", error);
-              break;
-            }
-          }
-        };
-
-        const fetchAllComments = async () => {
-          const commentRequests = allCommits.map((commit) =>
-            fetch(
-              `https://api.github.com/repos/${repoOwner}/${repoName}/commits/${commit.sha}/comments`,
-              {
-                headers: {
-                  Authorization: `token ${encodeURIComponent(token)}`,
-                  Accept: "application/vnd.github.v3+json",
-                },
-              }
-            )
-              .then((res) => res.json())
-              .then((comments) => {
-                if (Array.isArray(comments)) {
-                  return comments.map((comment) => ({
-                    type: "comment",
-                    author: comment.user.login,
-                    message: comment.body,
-                    url: comment.html_url,
-                  }));
-                }
-                return [];
-              })
-              .catch((error) => {
-                console.error(`${commit.sha} 코멘트 가져오기 실패:`, error);
-                return [];
-              })
+        try {
+          const allCommits = await GitHubAPI.fetchAllCommits(
+            repoOwner,
+            repoName,
+            token
+          );
+          const allComments = await GitHubAPI.fetchAllComments(
+            repoOwner,
+            repoName,
+            token,
+            allCommits
           );
 
-          const allCommentsArray = await Promise.all(commentRequests);
-          allComments = allCommentsArray.flat(); // 2D 배열을 1D 배열로 변환
-          console.log(`모든 코멘트 데이터 가져옴: ${allComments.length}개`);
-        };
-
-        (async () => {
-          await fetchAllCommits(); // 모든 커밋 가져오기
-          await fetchAllComments(); // 모든 코멘트 가져오기
-
-          // 검색 키워드로 필터링
           const filteredCommits = allCommits.filter((commit) =>
             commit.message.toLowerCase().includes(keyword.toLowerCase())
           );
-
           const filteredComments = allComments.filter((comment) =>
             comment.message.toLowerCase().includes(keyword.toLowerCase())
           );
 
-          console.log("필터링된 커밋:", filteredCommits);
-          console.log("필터링된 코멘트:", filteredComments);
-
-          // 검색 결과 및 레포 정보 저장(팝업 닫아도 유지되도록)
           chrome.storage.local.set({
             lastRepoOwner: repoOwner,
             lastRepoName: repoName,
@@ -212,15 +63,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             lastComments: allComments,
           });
 
-          // 필터링된 검색 결과 반환
           sendResponse({ results: [...filteredCommits, ...filteredComments] });
-        })().catch((error) => {
+        } catch (error) {
           console.error("[Error] API 요청 실패:", error);
           sendResponse({ error: error.message });
-        });
+        }
       }
     );
 
-    return true; // 비동기 응답
+    return true;
   }
 });
