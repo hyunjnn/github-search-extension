@@ -1,0 +1,41 @@
+.repoAlert {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    color: #ffffff;
+    max-width: 100%;
+    height: 24px; 
+    gap: 8px;
+  }
+  
+  .repoName {
+    font-weight: bold;
+    color: #0de761;
+    font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80%;
+  }
+  
+  .switchRepoBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    width: 22px;
+    height: 22px;
+    color: #ffffff;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  
+  .switchRepoBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }

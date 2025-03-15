@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./SearchResults.module.css";
 
 interface CommitResultCardProps {
@@ -7,11 +6,17 @@ interface CommitResultCardProps {
   url: string;
 }
 
-const CommitResultCard: React.FC<CommitResultCardProps> = ({ author, message, url }) => {
+const CommitResultCard = ({ author, message, url }: CommitResultCardProps) => {
   return (
     <div className={styles.commitCard}>
-      <strong className={styles.author}>{author || "Unknown"}</strong>: {message || "No message"}
-      <a href={url} target="_blank" rel="noopener noreferrer" className={styles.link}>
+      <strong className={styles.author}>{author || "Unknown"}</strong>:{" "}
+      {message || "No message"}
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.link}
+      >
         🔗 Link
       </a>
     </div>

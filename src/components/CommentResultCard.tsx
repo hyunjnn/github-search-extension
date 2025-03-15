@@ -1,6 +1,5 @@
-import React from "react";
 import styles from "./SearchResults.module.css";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
 
 interface CommentResultCardProps {
   author?: string;
@@ -8,14 +7,23 @@ interface CommentResultCardProps {
   url: string;
 }
 
-const CommentResultCard: React.FC<CommentResultCardProps> = ({ author, message, url }) => {
+const CommentResultCard = ({
+  author,
+  message,
+  url,
+}: CommentResultCardProps) => {
   return (
     <div className={styles.commentCard}>
-      <strong className={styles.author}>{author || "Unknown"}</strong>: 
+      <strong className={styles.author}>{author || "Unknown"}</strong>:
       <div className={styles.message}>
         <ReactMarkdown>{message || "No message"}</ReactMarkdown>
       </div>
-      <a href={url} target="_blank" rel="noopener noreferrer" className={styles.link}>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.link}
+      >
         🔗 Link
       </a>
     </div>
