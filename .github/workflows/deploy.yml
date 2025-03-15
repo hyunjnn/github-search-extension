@@ -14,7 +14,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: npm install -g chrome-webstore-upload-cli
+        run: npm install 
+
+      - name: Build project
+        run: npm run build
 
       - name: Build extension
         run: zip -r my-extension.zip dist/
