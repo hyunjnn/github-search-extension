@@ -1,0 +1,36 @@
+name: Deploy Chrome Extension 
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install -g chrome-webstore-upload-cli
+
+      - name: Build extension
+        run: zip -r my-extension.zip dist/
+
+      - name: Upload and publish to Chrome Web Store
+        env:
+          EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        run: |
+          echo '{
+            "extensionId": "'"$EXTENSION_ID"'",
+            "clientId": "'"$CLIENT_ID"'",
+            "clientSecret": "'"$CLIENT_SECRET"'",
+            "refreshToken": "'"$REFRESH_TOKEN"'"
+          }' > chrome-webstore-auth.json
+
+          chrome-webstore-upload upload --source my-extension.zip && chrome-webstore-upload publish
