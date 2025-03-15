@@ -36,34 +36,37 @@ export const GitHubAPI = {
   },
 
   fetchAllComments: async (repoOwner, repoName, token, commits) => {
-    const commentRequests = commits.map((commit) =>
-      fetch(
-        `https://api.github.com/repos/${repoOwner}/${repoName}/commits/${commit.sha}/comments`,
-        {
-          headers: {
-            Authorization: `token ${encodeURIComponent(token)}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      )
-        .then((res) => res.json())
-        .then((comments) =>
-          Array.isArray(comments)
-            ? comments.map((comment) => ({
+    try {
+      const commentRequests = commits.map(async (commit) => {
+        try {
+          const response = await axios.get(
+            `https://api.github.com/repos/${repoOwner}/${repoName}/commits/${commit.sha}/comments`,
+            {
+              headers: {
+                Authorization: `token ${encodeURIComponent(token)}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+
+          return Array.isArray(response.data)
+            ? response.data.map((comment) => ({
                 type: "comment",
                 author: comment.user.login,
                 message: comment.body,
                 url: comment.html_url,
               }))
-            : []
-        )
-        .catch((error) => {
+            : [];
+        } catch (error) {
           console.error(`${commit.sha} 코멘트 가져오기 실패:`, error);
           return [];
-        })
-    );
+        }
+      });
 
-    const allCommentsArray = await Promise.all(commentRequests);
-    return allCommentsArray.flat();
+      const allCommentsArray = await Promise.all(commentRequests);
+      return allCommentsArray.flat();
+    } catch (error) {
+      console.error("모든 코멘트 가져오기 실패: ", error);
+    }
   },
 };
