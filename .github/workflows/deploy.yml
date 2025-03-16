@@ -34,7 +34,7 @@ jobs:
           fi
 
       - name: Build extension
-        run: zip -r my-extension.zip dist/
+        run: cd dist && zip -r ../my-extension.zip .
 
       - name: Upload and publish to Chrome Web Store
         env:
