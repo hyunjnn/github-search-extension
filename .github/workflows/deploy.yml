@@ -34,11 +34,11 @@ jobs:
           fi
 
       - name: Build extension
-        run: cd dist && zip -r ../my-extension.zip .
+        run: cd dist && zip -r my-extension.zip .
 
       # 압축된 파일 내부 구조 확인(디버깅용)
       - name: List contents of my-extension.zip
-        run: unzip -l my-extension.zip
+        run: unzip -l dist/my-extension.zip
 
       - name: Upload and publish to Chrome Web Store
         env:
@@ -54,5 +54,4 @@ jobs:
             "refreshToken": "'"$REFRESH_TOKEN"'"
           }' > chrome-webstore-auth.json
 
-          cd dist
-          chrome-webstore-upload upload --source my-extension.zip && chrome-webstore-upload publish
+          chrome-webstore-upload upload --source dist/my-extension.zip --auto-publish
