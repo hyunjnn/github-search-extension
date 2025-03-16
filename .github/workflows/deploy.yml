@@ -22,7 +22,7 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # dist/ 폴더 및 파일 확인(디버깅용)
+      # 압축 전에 dist/ 폴더 구조 확인(디버깅용)
       - name: List dist directory contents
         run: ls -al dist/
 
@@ -35,6 +35,10 @@ jobs:
 
       - name: Build extension
         run: cd dist && zip -r ../my-extension.zip .
+
+      # 압축된 파일 내부 구조 확인(디버깅용)
+      - name: List contents of my-extension.zip
+        run: unzip -l my-extension.zip
 
       - name: Upload and publish to Chrome Web Store
         env:
@@ -50,4 +54,5 @@ jobs:
             "refreshToken": "'"$REFRESH_TOKEN"'"
           }' > chrome-webstore-auth.json
 
+          cd dist
           chrome-webstore-upload upload --source my-extension.zip && chrome-webstore-upload publish
