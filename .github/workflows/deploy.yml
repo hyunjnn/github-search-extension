@@ -22,6 +22,17 @@ jobs:
       - name: Build project
         run: npm run build
 
+      # dist/ 폴더 및 파일 확인(디버깅용)
+      - name: List dist directory contents
+        run: ls -al dist/
+
+      - name: Check manifest.json
+        run: |
+          if [ ! -f "dist/manifest.json" ]; then 
+            echo "manifest.json not found in dist/"; 
+            exit 1; 
+          fi
+
       - name: Build extension
         run: zip -r my-extension.zip dist/
 
