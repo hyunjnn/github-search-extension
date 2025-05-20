@@ -11,9 +11,7 @@ GitHub에서 특정 키워드가 포함된 **커밋 메시지 & 커밋 코멘트
 ## ✨ 제공 기능
 
 ✔️ 찾고자하는 GitHub 커밋 메시지 및 커밋 코멘트 검색 시 링크 제공  
-✔️ **자신의 비공개 레포지토리도 검색 가능 (GitHub Personal Access Token 필요)**  
-✔️ 검색 결과를 클릭하면 해당 링크로 바로 이동  
-➕ OAuth2를 활용하여 직접 토큰을 입력하지 않고 검색하도록 프로젝트 확장 가능  
+✔️ 검색 결과를 클릭하면 해당 커밋으로 바로 이동  
 
 ## 🔥실행 화면 
 ### 1. 검색하기
@@ -65,7 +63,7 @@ GitHub에서 특정 키워드가 포함된 **커밋 메시지 & 커밋 코멘트
 ### 1. **GitHub에서 코드 다운로드**
 
 ```sh
-git clone https://github.com/hs-2171098-hyunjinchoi/github-comment-search.git
+git clone https://github.com/hs-2171098-hyunjnn/github-comment-search.git
 cd github-comment-search
 ```
 
@@ -83,10 +81,3 @@ npm run build
     3. 왼쪽 상단의 "압축해제된 확장 프로그램을 로드합니다." 버튼 클릭
     4. 빌드 후 생성된 dist 폴더 선택
 
-## 🔑 GitHub Personal Access Token 발급 방법
-
-    1. GitHub Personal Access Token 생성 페이지로 이동
-    2. Generate new token 클릭 (GitHub API v3 권한 설정 필요)
-    3. 필요한 권한 선택
-      - repo → 비공개 레포지토리 검색 시 필요
-      - read:org → 조직 내 레포지토리 검색 시 필요
